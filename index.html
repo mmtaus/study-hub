@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Study Hub">
+<meta name="theme-color" content="#1a3d27">
+<title>NCE & CPCE Study Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2ec;
+  --surface: #ffffff;
+  --surface2: #ede9e1;
+  --border: #ddd8ce;
+  --text: #1a1712;
+  --muted: #7a7265;
+  --accent: #1a3d27;
+  --accent-mid: #2d5f3f;
+  --accent-light: #e4efe8;
+  --accent-text: #112a1b;
+  --warm: #b85c2a;
+  --warm-light: #fdf0e8;
+  --warm-text: #7a3318;
+  --blue: #1e3a5f;
+  --blue-light: #e6edf5;
+  --blue-text: #122440;
+  --nav-h: 64px;
+  --top-h: 56px;
+  --radius: 12px;
+  --radius-lg: 18px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* ── App shell ── */
+.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+/* ── Top bar ── */
+.topbar {
+  height: var(--top-h);
+  min-height: var(--top-h);
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  padding-top: env(safe-area-inset-top);
+}
+
+.topbar-title {
+  font-family: 'Lora', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: white;
+  flex: 1;
+}
+
+.topbar-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+}
+
+/* ── Scrollable content ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--nav-h) + 8px + env(safe-area-inset-bottom));
+}
+
+/* ── Bottom nav ── */
+.bottomnav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  z-index: 100;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px 4px;
+  transition: background 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.nav-item:active { background: var(--surface2); }
+
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label { font-size: 10px; color: var(--muted); font-weight: 400; letter-spacing: 0.02em; }
+.nav-item.active .nav-label { color: var(--accent); font-weight: 500; }
+.nav-item.active .nav-icon { filter: none; }
+
+/* ── Panels ── */
+.panel { display: none; padding: 16px; }
+.panel.active { display: block; }
+
+/* ── Home ── */
+.home-header {
+  background: var(--accent);
+  margin: -16px -16px 16px;
+  padding: 20px 20px 24px;
+}
+
+.home-greeting {
+  font-family: 'Lora', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.home-sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 18px; }
+
+.prog-bar-wrap { background: rgba(255,255,255,0.2); border-radius: 99px; height: 5px; margin-bottom: 5px; }
+.prog-bar-fill { height: 100%; border-radius: 99px; background: white; transition: width 0.5s ease; }
+.prog-bar-label { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quick-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-card:active { transform: scale(0.97); background: var(--surface2); }
+
+.qc-icon { font-size: 22px; margin-bottom: 8px; }
+.qc-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.qc-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ── Section labels ── */
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 500;
+  margin: 20px 0 10px;
+}
+
+/* ── Curriculum ── */
+.domain-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.domain-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.domain-head:active { background: var(--surface2); }
+
+.domain-num { font-size: 12px; color: var(--muted); min-width: 18px; font-weight: 500; }
+.domain-name { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; line-height: 1.3; }
+
+.domain-chips { display: flex; flex-direction: column; gap: 3px; align-items: flex-end; }
+
+.chip {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.chip-done { background: var(--accent-light); color: var(--accent-text); }
+.chip-prog { background: var(--warm-light); color: var(--warm-text); }
+.chip-todo { background: var(--surface2); color: var(--muted); }
+
+.chevron { font-size: 10px; color: var(--muted); transition: transform 0.2s; margin-left: 4px; }
+.chevron.open { transform: rotate(90deg); }
+
+.domain-body { display: none; border-top: 1px solid var(--border); }
+.domain-body.open { display: block; }
+
+.topic-row {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.topic-row:last-child { border-bottom: none; }
+
+.topic-name { font-size: 13px; color: var(--text); margin-bottom: 8px; line-height: 1.4; }
+
+.topic-btns { display: flex; gap: 7px; flex-wrap: wrap; }
+
+.t-btn {
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.12s;
+  min-height: 32px;
+}
+
+.t-btn:active { transform: scale(0.96); }
+.t-btn.study-btn { color: var(--blue); background: var(--blue-light); border-color: #b8cfe0; }
+.t-btn.learning { background: var(--warm-light); color: var(--warm-text); border-color: #e8b898; }
+.t-btn.known { background: var(--accent-light); color: var(--accent-text); border-color: #a8cdb4; }
+
+/* ── Tutor panel ── */
+.mode-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mode-scroll::-webkit-scrollbar { display: none; }
+
+.mode-pill {
+  padding: 8px 16px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  min-height: 36px;
+  transition: all 0.12s;
+}
+
+.mode-pill.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.topic-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 20px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.topic-scroll::-webkit-scrollbar { display: none; }
+
+.tp-pill {
+  padding: 8px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  min-height: 36px;
+  transition: all 0.12s;
+}
+
+.tp-pill.sel { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent-mid); }
+
+.gen-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 50px;
+  transition: all 0.15s;
+}
+
+.gen-btn:active { background: var(--accent-mid); transform: scale(0.98); }
+
+.tutor-output {
+  margin-top: 20px;
+}
+
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.result-card h1, .result-card h2, .result-card h3 {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 16px 0 6px;
+}
+
+.result-card h1:first-child, .result-card h2:first-child, .result-card h3:first-child { margin-top: 0; }
+.result-card p { margin-bottom: 10px; }
+.result-card p:last-child { margin-bottom: 0; }
+.result-card ul, .result-card ol { padding-left: 18px; margin-bottom: 10px; }
+.result-card li { margin-bottom: 5px; }
+.result-card strong { font-weight: 500; }
+.result-card hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+.result-card table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+.result-card th { background: var(--surface2); padding: 7px 10px; text-align: left; font-size: 11px; font-weight: 500; color: var(--muted); }
+.result-card td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.result-card tr:last-child td { border-bottom: none; }
+
+/* ── Chat ── */
+.chat-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--top-h) - var(--nav-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.msg {
+  max-width: 88%;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.msg.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 18px 18px 4px 18px;
+}
+
+.msg.ai {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 16px;
+  border-radius: 4px 18px 18px 18px;
+}
+
+.msg.ai h1, .msg.ai h2, .msg.ai h3 {
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 12px 0 5px;
+}
+
+.msg.ai h1:first-child, .msg.ai h2:first-child, .msg.ai h3:first-child { margin-top: 0; }
+.msg.ai p { margin-bottom: 8px; }
+.msg.ai p:last-child { margin-bottom: 0; }
+.msg.ai ul, .msg.ai ol { padding-left: 16px; margin-bottom: 8px; }
+.msg.ai li { margin-bottom: 4px; }
+.msg.ai strong { font-weight: 500; }
+.msg.ai hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.msg.ai table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+.msg.ai th { background: var(--surface2); padding: 6px 8px; font-size: 11px; font-weight: 500; color: var(--muted); text-align: left; }
+.msg.ai td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+
+.typing-indicator {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px 18px 18px 18px;
+  padding: 12px 16px;
+  display: none;
+  gap: 5px;
+  align-items: center;
+}
+
+.typing-indicator.show { display: flex; }
+
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-6px); opacity: 1; }
+}
+
+.chat-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  min-height: 42px;
+  max-height: 100px;
+  line-height: 1.4;
+  -webkit-appearance: none;
+}
+
+.chat-input:focus { border-color: var(--accent-mid); }
+
+.send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.send-btn:active { transform: scale(0.92); background: var(--accent-mid); }
+.send-btn:disabled { opacity: 0.4; }
+
+/* ── Settings ── */
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.settings-row {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-row:last-child { border-bottom: none; }
+
+.settings-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.settings-hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.settings-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+  margin-top: 4px;
+}
+
+.settings-input:focus { border-color: var(--accent-mid); }
+
+.api-status { font-size: 12px; margin-top: 4px; }
+.api-status.ok { color: var(--accent-mid); }
+.api-status.err { color: var(--warm); }
+
+.no-api-banner {
+  background: var(--warm-light);
+  border: 1px solid #e8b898;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--warm-text);
+  margin-bottom: 16px;
+  display: none;
+  line-height: 1.5;
+}
+
+.no-api-banner.show { display: block; }
+
+/* ── Loading ── */
+.loading-text {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 20px 0;
+  text-align: center;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-title">Study Hub</div>
+    <div class="topbar-sub" id="topbar-prog">0 / 40 mastered</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content" id="content">
+
+    <!-- HOME -->
+    <div class="panel active" id="panel-home">
+      <div class="home-header">
+        <div class="home-greeting">Ready to study?</div>
+        <div class="home-sub">NCE &amp; CPCE · September exam</div>
+        <div class="prog-bar-wrap"><div class="prog-bar-fill" id="home-prog-fill" style="width:0%"></div></div>
+        <div class="prog-bar-label" id="home-prog-label">0 of 40 topics mastered</div>
+      </div>
+
+      <div class="section-label">Jump in</div>
+      <div class="quick-grid">
+        <div class="quick-card" onclick="launchMode('lesson')">
+          <div class="qc-icon">📖</div>
+          <div class="qc-name">Mini-lesson</div>
+          <div class="qc-desc">Plain English + real example</div>
+        </div>
+        <div class="quick-card" onclick="launchMode('quiz')">
+          <div class="qc-icon">✏️</div>
+          <div class="qc-name">Practice Q</div>
+          <div class="qc-desc">Multiple choice, exam-style</div>
+        </div>
+        <div class="quick-card" onclick="launchMode('flashcard')">
+          <div class="qc-icon">🃏</div>
+          <div class="qc-name">Flashcard</div>
+          <div class="qc-desc">Quick front/back review</div>
+        </div>
+        <div class="quick-card" onclick="launchMode('mnemonics')">
+          <div class="qc-icon">🧠</div>
+          <div class="qc-name">Mnemonics</div>
+          <div class="qc-desc">Memory tricks that stick</div>
+        </div>
+        <div class="quick-card" onclick="showPanel('curriculum')">
+          <div class="qc-icon">📋</div>
+          <div class="qc-name">Curriculum</div>
+          <div class="qc-desc">Track all 9 domains</div>
+        </div>
+        <div class="quick-card" onclick="showPanel('chat')">
+          <div class="qc-icon">💬</div>
+          <div class="qc-name">Ask anything</div>
+          <div class="qc-desc">Free chat with your tutor</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CURRICULUM -->
+    <div class="panel" id="panel-curriculum">
+      <div class="section-label" style="margin-top: 4px;">All domains</div>
+      <div id="curriculum-list"></div>
+    </div>
+
+    <!-- TUTOR -->
+    <div class="panel" id="panel-tutor">
+      <div class="no-api-banner" id="tutor-no-api">
+        ⚠ Add your API key in Settings to enable AI. Get one free at <strong>console.anthropic.com</strong>
+      </div>
+
+      <div class="section-label" style="margin-top: 4px;">Mode</div>
+      <div class="mode-scroll" id="mode-scroll">
+        <button class="mode-pill active" data-mode="lesson">Mini-lesson</button>
+        <button class="mode-pill" data-mode="quiz">Practice Q</button>
+        <button class="mode-pill" data-mode="flashcard">Flashcard</button>
+        <button class="mode-pill" data-mode="mnemonics">Mnemonics</button>
+        <button class="mode-pill" data-mode="explain">Explain</button>
+      </div>
+
+      <div class="section-label">Topic</div>
+      <div class="topic-scroll" id="topic-scroll"></div>
+
+      <button class="gen-btn" onclick="generateFromTutor()">Generate →</button>
+
+      <div class="tutor-output" id="tutor-output"></div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="panel" id="panel-chat" style="padding: 0;">
+      <div class="chat-wrap">
+        <div class="messages" id="messages">
+          <div class="msg ai">
+            Hi! I'm your NCE &amp; CPCE tutor. Ask me anything — a concept you're unsure about, "quiz me on ethics," or "explain the difference between Rogers and Adler." I'm here to help.
+          </div>
+        </div>
+        <div class="typing-indicator" id="typing">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chat-input" rows="1" placeholder="Ask anything…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+      <div class="section-label" style="margin-top: 4px;">API key</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div class="settings-label">Anthropic API key</div>
+          <div class="settings-hint">Required for AI features. Get a free key at <strong>console.anthropic.com</strong> — sign up, go to API Keys, and create one.</div>
+          <input type="password" class="settings-input" id="api-key" placeholder="sk-ant-..." oninput="saveKey()">
+          <div class="api-status" id="api-status"></div>
+        </div>
+      </div>
+
+      <div class="section-label">Progress</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div class="settings-label">Overall mastery</div>
+          <div class="settings-hint" id="settings-prog-text">0 of 40 topics marked as "Know it"</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-label" style="color: var(--warm);">Reset progress</div>
+          <div class="settings-hint">Clears all your learning / know-it markers.</div>
+          <button class="t-btn" style="margin-top: 6px; color: var(--warm); border-color: #e8b898;" onclick="resetProgress()">Reset all progress</button>
+        </div>
+      </div>
+
+      <div class="section-label">About</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div class="settings-label">NCE & CPCE Study Hub</div>
+          <div class="settings-hint">Built for your September exam. All 9 CACREP domains. AI-powered lessons, practice questions, flashcards, and mnemonics.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <nav class="bottomnav">
+    <button class="nav-item active" id="nav-home" onclick="showPanel('home')">
+      <span class="nav-icon">⌂</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" id="nav-curriculum" onclick="showPanel('curriculum')">
+      <span class="nav-icon">▦</span>
+      <span class="nav-label">Curriculum</span>
+    </button>
+    <button class="nav-item" id="nav-tutor" onclick="showPanel('tutor')">
+      <span class="nav-icon">✦</span>
+      <span class="nav-label">Tutor</span>
+    </button>
+    <button class="nav-item" id="nav-chat" onclick="showPanel('chat')">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Chat</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="showPanel('settings')">
+      <span class="nav-icon">⚙</span>
+      <span class="nav-label">Settings</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+// ── Curriculum data ──────────────────────────────────────
+const curriculum = [
+  { name: "Human Growth & Development", topics: [
+    "Erikson's 8 stages of psychosocial development",
+    "Piaget's cognitive development stages",
+    "Kohlberg's moral development",
+    "Attachment theory (Bowlby & Ainsworth)",
+    "Bronfenbrenner's ecological model"
+  ]},
+  { name: "Social & Cultural Diversity", topics: [
+    "Multicultural counseling competencies",
+    "Racial & ethnic identity models",
+    "Privilege, oppression & social justice",
+    "Acculturation & worldview",
+    "Cross-cultural communication styles"
+  ]},
+  { name: "Counseling & Helping Relationships", topics: [
+    "Person-centered therapy (Rogers)",
+    "Cognitive-behavioral therapy (CBT)",
+    "Adlerian therapy",
+    "Existential & humanistic approaches",
+    "Solution-focused & narrative therapy"
+  ]},
+  { name: "Group Counseling & Group Work", topics: [
+    "Types of groups (psychoeducational, counseling, therapy, task)",
+    "Stages of group development (Tuckman & Corey)",
+    "Group leader roles & techniques",
+    "Group dynamics & curative factors (Yalom)"
+  ]},
+  { name: "Career Development", topics: [
+    "Holland's RIASEC theory",
+    "Super's life-span theory",
+    "Krumboltz's social learning theory",
+    "Gottfredson's circumscription & compromise",
+    "Career counseling assessments"
+  ]},
+  { name: "Assessment & Testing", topics: [
+    "Reliability & validity",
+    "Standardization & norms",
+    "Types of tests (aptitude, achievement, personality)",
+    "Interpreting scores (mean, SD, percentiles)",
+    "Ethical issues in assessment"
+  ]},
+  { name: "Research & Program Evaluation", topics: [
+    "Quantitative vs qualitative research",
+    "Experimental & quasi-experimental designs",
+    "Descriptive statistics",
+    "Inferential statistics & hypothesis testing",
+    "Single-subject research"
+  ]},
+  { name: "Ethics & Professional Orientation", topics: [
+    "ACA Code of Ethics (2014)",
+    "Confidentiality & its limits (Tarasoff)",
+    "Informed consent & client rights",
+    "Dual relationships & boundaries",
+    "Licensure, credentialing & supervision"
+  ]},
+  { name: "Diagnosis & DSM-5", topics: [
+    "DSM-5 structure & major changes from DSM-IV",
+    "Mood disorders (depression, bipolar)",
+    "Anxiety disorders",
+    "Trauma & stressor-related disorders (PTSD)",
+    "Personality disorders overview"
+  ]},
+];
+
+// ── State ────────────────────────────────────────────────
+let topicStates = JSON.parse(localStorage.getItem('topicStates') || '{}');
+let chatHistory = [];
+let selectedTopic = null;
+let selectedMode = 'lesson';
+const openDomains = new Set([0]);
+
+// ── Init ─────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('apiKey') || '';
+  if (saved) document.getElementById('api-key').value = saved;
+  updateApiStatus();
+  renderCurriculum();
+  renderTopicPicker();
+  setupModeButtons();
+  updateProgress();
+});
+
+// ── API ──────────────────────────────────────────────────
+function saveKey() {
+  const k = document.getElementById('api-key').value.trim();
+  if (k) localStorage.setItem('apiKey', k);
+  updateApiStatus();
+}
+
+function getKey() { return localStorage.getItem('apiKey') || ''; }
+
+function updateApiStatus() {
+  const k = getKey();
+  const el = document.getElementById('api-status');
+  if (k.startsWith('sk-ant-')) { el.textContent = '✓ Key saved'; el.className = 'api-status ok'; }
+  else if (k) { el.textContent = 'Key format looks off'; el.className = 'api-status err'; }
+  else { el.textContent = ''; }
+}
+
+async function callClaude(messages, system) {
+  const key = getKey();
+  if (!key) return null;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: system || 'You are an expert NCE and CPCE exam tutor. Be clear, educational, and encouraging. Use plain language. Format with markdown (bold, headers, tables, lists) for readability.',
+      messages
+    })
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+// ── Markdown ─────────────────────────────────────────────
+function md(text) {
+  return text
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/^\| (.+) \|$/gm, (_, row) => '<tr>' + row.split(' | ').map(c => `<td>${c}</td>`).join('') + '</tr>')
+    .replace(/(<tr>.*<\/tr>\n?)+/g, m => `<table>${m}</table>`)
+    .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
+    .replace(/(<li>.*<\/li>\n?)+(?=<li>|$)/g, m => m.match(/^\d/) ? `<ol>${m}</ol>` : `<ul>${m}</ul>`)
+    .replace(/^[-•] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n/g, '</p><p>')
+    .trim();
+}
+
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Panel nav ────────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const navMap = { home: 'nav-home', curriculum: 'nav-curriculum', tutor: 'nav-tutor', chat: 'nav-chat', settings: 'nav-settings' };
+  if (navMap[id]) document.getElementById(navMap[id]).classList.add('active');
+  document.getElementById('content').scrollTop = 0;
+}
+
+// ── Progress ─────────────────────────────────────────────
+function updateProgress() {
+  const total = curriculum.reduce((a, d) => a + d.topics.length, 0);
+  const known = Object.values(topicStates).filter(v => v === 'know').length;
+  const pct = Math.round((known / total) * 100);
+  document.getElementById('home-prog-fill').style.width = pct + '%';
+  document.getElementById('home-prog-label').textContent = `${known} of ${total} topics mastered`;
+  document.getElementById('topbar-prog').textContent = `${known} / ${total} mastered`;
+  document.getElementById('settings-prog-text').textContent = `${known} of ${total} topics marked as "Know it"`;
+}
+
+function setTopicState(dIdx, tIdx, val) {
+  const key = `${dIdx}-${tIdx}`;
+  topicStates[key] = (topicStates[key] === val) ? 'none' : val;
+  localStorage.setItem('topicStates', JSON.stringify(topicStates));
+  updateProgress();
+  renderCurriculum();
+}
+
+function resetProgress() {
+  if (confirm('Reset all progress?')) {
+    topicStates = {};
+    localStorage.removeItem('topicStates');
+    updateProgress();
+    renderCurriculum();
+  }
+}
+
+// ── Curriculum ───────────────────────────────────────────
+function renderCurriculum() {
+  const wrap = document.getElementById('curriculum-list');
+  wrap.innerHTML = '';
+  curriculum.forEach((domain, dIdx) => {
+    const known = domain.topics.filter((_, tIdx) => topicStates[`${dIdx}-${tIdx}`] === 'know').length;
+    const learning = domain.topics.filter((_, tIdx) => topicStates[`${dIdx}-${tIdx}`] === 'learn').length;
+    const isOpen = openDomains.has(dIdx);
+
+    let chips = '';
+    if (known === domain.topics.length) chips = `<span class="chip chip-done">All done ✓</span>`;
+    else {
+      if (learning) chips += `<span class="chip chip-prog">${learning} learning</span>`;
+      if (known) chips += `<span class="chip chip-done">${known} known</span>`;
+      if (!known && !learning) chips = `<span class="chip chip-todo">${domain.topics.length} topics</span>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'domain-card';
+    card.innerHTML = `
+      <div class="domain-head" onclick="toggleDomain(${dIdx})">
+        <span class="domain-num">${dIdx + 1}</span>
+        <span class="domain-name">${domain.name}</span>
+        <span class="domain-chips">${chips}</span>
+        <span class="chevron ${isOpen ? 'open' : ''}">▶</span>
+      </div>
+      <div class="domain-body ${isOpen ? 'open' : ''}">
+        ${domain.topics.map((topic, tIdx) => {
+          const s = topicStates[`${dIdx}-${tIdx}`] || 'none';
+          return `<div class="topic-row">
+            <div class="topic-name">${topic}</div>
+            <div class="topic-btns">
+              <button class="t-btn study-btn" onclick="studyTopic('${topic.replace(/'/g,"\\'")}','${domain.name.replace(/'/g,"\\'")}')">Study →</button>
+              <button class="t-btn ${s==='learn'?'learning':''}" onclick="setTopicState(${dIdx},${tIdx},'learn')">Learning</button>
+              <button class="t-btn ${s==='know'?'known':''}" onclick="setTopicState(${dIdx},${tIdx},'know')">Know it ✓</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function toggleDomain(dIdx) {
+  if (openDomains.has(dIdx)) openDomains.delete(dIdx);
+  else openDomains.add(dIdx);
+  renderCurriculum();
+}
+
+// ── Tutor ────────────────────────────────────────────────
+function setupModeButtons() {
+  document.querySelectorAll('#mode-scroll .mode-pill').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('#mode-scroll .mode-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMode = btn.dataset.mode;
+    };
+  });
+}
+
+function renderTopicPicker() {
+  const wrap = document.getElementById('topic-scroll');
+  curriculum.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'tp-pill';
+    btn.textContent = d.name.replace(' & ', ' & ');
+    btn.onclick = () => {
+      document.querySelectorAll('.tp-pill').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      selectedTopic = d.name;
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+const modePrompts = {
+  lesson: t => `Teach me about "${t}" for the NCE/CPCE exam. Plain-English explanation (2-3 sentences), a real-world counseling example, then 2-3 key exam takeaways.`,
+  quiz: t => `Write one multiple-choice practice question for the NCE/CPCE on "${t}". Include four answer choices (A, B, C, D). Then show the correct answer and explain why each option is right or wrong.`,
+  flashcard: t => `Create a single NCE/CPCE flashcard for "${t}".\n\n**FRONT:** [a question or term]\n**BACK:** [concise answer]\n**Memory tip:** [optional mnemonic]`,
+  mnemonics: t => `Give me 2-3 creative mnemonics or memory tricks to remember key facts about "${t}" for the NCE/CPCE. Make them memorable. Explain what each part stands for.`,
+  explain: t => `I'm studying for the NCE/CPCE. Explain "${t}" in plain language. What is it, why does it matter in counseling, and what are the common exam pitfalls?`
+};
+
+async function generateFromTutor() {
+  const key = getKey();
+  if (!key) { document.getElementById('tutor-no-api').classList.add('show'); return; }
+  document.getElementById('tutor-no-api').classList.remove('show');
+
+  const topic = selectedTopic || 'a random NCE/CPCE topic (choose one from the nine CACREP domains)';
+  const prompt = modePrompts[selectedMode](topic);
+
+  document.getElementById('tutor-output').innerHTML = '<div class="loading-text">Generating…</div>';
+
+  try {
+    const response = await callClaude([{ role: 'user', content: prompt }]);
+    document.getElementById('tutor-output').innerHTML = `<div class="result-card">${md(response)}</div>`;
+  } catch (e) {
+    document.getElementById('tutor-output').innerHTML = `<div style="color:var(--warm);font-size:13px;padding:12px 0;">Error: ${e.message}</div>`;
+  }
+}
+
+async function studyTopic(topic, domain) {
+  showPanel('tutor');
+  document.getElementById('tutor-output').innerHTML = `<div class="loading-text">Loading lesson on "${topic}"…</div>`;
+
+  const key = getKey();
+  if (!key) {
+    document.getElementById('tutor-no-api').classList.add('show');
+    document.getElementById('tutor-output').innerHTML = '';
+    return;
+  }
+
+  const prompt = `I'm studying for the NCE/CPCE. Teach me "${topic}" (from the ${domain} domain) using this format:\n\n1. Plain-English explanation (2-3 sentences)\n2. Real-world counseling example\n3. One practice exam question with 4 choices (A/B/C/D) + correct answer explained\n4. The #1 thing to remember for the exam`;
+
+  try {
+    const response = await callClaude([{ role: 'user', content: prompt }]);
+    document.getElementById('tutor-output').innerHTML = `<div class="result-card">${md(response)}</div>`;
+  } catch (e) {
+    document.getElementById('tutor-output').innerHTML = `<div style="color:var(--warm);font-size:13px;padding:12px 0;">Error: ${e.message}</div>`;
+  }
+}
+
+function launchMode(mode) {
+  showPanel('tutor');
+  document.querySelectorAll('#mode-scroll .mode-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  selectedMode = mode;
+}
+
+// ── Chat ─────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const key = getKey();
+  if (!key) {
+    addMsg('ai', '⚠ Add your API key in Settings to enable chat.');
+    return;
+  }
+
+  input.value = '';
+  input.style.height = 'auto';
+  addMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('typing').classList.add('show');
+  scrollChat();
+
+  try {
+    const reply = await callClaude(chatHistory, 'You are an expert NCE and CPCE exam prep tutor. The student is preparing for their September exam. Be encouraging, clear, and practical. Reference the 9 CACREP domains when relevant. Format answers with markdown.');
+    document.getElementById('typing').classList.remove('show');
+    chatHistory.push({ role: 'assistant', content: reply });
+    addMsg('ai', reply);
+  } catch (e) {
+    document.getElementById('typing').classList.remove('show');
+    addMsg('ai', `Error: ${e.message}`);
+  }
+
+  document.getElementById('send-btn').disabled = false;
+  scrollChat();
+}
+
+function addMsg(role, text) {
+  const wrap = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = role === 'ai' ? md(text) : esc(text);
+  wrap.appendChild(div);
+  scrollChat();
+}
+
+function scrollChat() {
+  const wrap = document.getElementById('messages');
+  setTimeout(() => wrap.scrollTop = wrap.scrollHeight, 60);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+// ── PWA service worker ───────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'study-hub-v1';
+    const ASSETS = [location.href];
+    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))));
+    self.addEventListener('fetch', e => {
+      if (e.request.url.includes('anthropic.com')) return;
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
+</body>
+</html>
